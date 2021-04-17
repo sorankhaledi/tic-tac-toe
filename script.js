@@ -2,17 +2,21 @@ const wrapper = document.querySelector(".grid-wrapper");
 const columns = document.getElementsByClassName("grid-column");
 
 
-let indexes = [
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    ''
-]
+let indexes = {
+   value:  [
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        ''
+    ],
+    len: 0
+} 
+let len = 0;
 
 let turn = {
     player: false,
@@ -41,9 +45,10 @@ comp.charachter = charachters.x;
 
 for (let i = 0; i < columns.length; i++) {
     columns[i].addEventListener("click", () => {
-        if (indexes[i] == '' && turn.player && gameIsRuning) {
+        if (indexes.value[i] == '' && turn.player && gameIsRuning) {
             columns[i].innerHTML = player.charachter;
-            indexes[i] = player.charachter;
+            indexes.value[i] = player.charachter;
+            indexes.len++;
             turn.player = false;
             turn.comp = true;
         }
@@ -51,8 +56,53 @@ for (let i = 0; i < columns.length; i++) {
 }
 
 
+compMove = () => {
+    const first = [0, 2, 4, 6, 8];
+    if(isEmpety()) {
+        let index = getRandomNumber(0, 4);
+        indexes.value[first[index]] = comp.charachter;
+        indexes.len++;
+        columns[first[index]].innerHTML = comp.charachter;
+    } else {
+        if(indexes.len === 1) {
+            first.splice(2, 1);
+            let index = getRandomNumber(0, 3);
+            while(indexes.value[first[index]] != '') {
+                index = getRandomNumber(0, 3);
+            }
+            indexes.value[first[index]] = comp.charachter;
+            indexes.len++;
+            columns[first[index]].innerHTML = comp.charachter;
+        } else if(indexes.len === 2) {
+            if(indexes.value[4] === '') {
+                indexes.value[4] = comp.charachter;
+                indexes.len++;
+                columns[4].innerHTML = comp.charachter;
+            } else {
+                first.splice(2, 1);
+                let index = getRandomNumber(0, 3);
+                while(indexes.value[first[index]] != '') {
+                    index = getRandomNumber(0, 3);
+                }
+                indexes.value[first[index]] = comp.charachter;
+                indexes.len++;
+                columns[first[index]].innerHTML = comp.charachter;
+            }
+        } else {
+            if(isPlayerWining()) {
+                // ==================== go from here =========================
+            }
+        }
+    }
+}
+
+
+isPlayerWining = () => {
+// should be defined
+}
+
 check = (first, second, third) => {
-    if (indexes[first] === indexes[second] && indexes[first] === indexes[third] && indexes[first] != '') {
+    if (indexes.value[first] === indexes.value[second] && indexes.value[first] === indexes.value[third] && indexes.value[first] != '') {
         return true;
     } else {
         return false;
@@ -60,14 +110,11 @@ check = (first, second, third) => {
 }
 
 isFull = () => {
-    let flag = true;
-    indexes.forEach(index => {
-        if (index === '') {
-            flag = false;
-        }
-    })
+    return indexes.len === indexes.value.length;
+}
 
-    return flag;
+isEmpety = () => {
+    return indexes.len === 0;
 }
 
 
@@ -100,12 +147,7 @@ compTurn = () => {
             gameIsRuning = false;
         } else {
             if (turn.comp && gameIsRuning) {
-                let index = getRandomNumber(0, 8);
-                while (indexes[index] != '') {
-                    index = getRandomNumber(0, 8);
-                }
-                indexes[index] = comp.charachter;
-                columns[index].innerHTML = comp.charachter;
+                compMove();
                 turn.comp = false;
                 turn.player = true;
             }
@@ -119,14 +161,14 @@ checkEnd = () => {
     // Checking Rows
     for (let i = 0; i <= 6; i += 3) {
         if (check(i, i + 1, i + 2)) {
-            return indexes[i];
+            return indexes.value[i];
         }
     }
 
     // Checking Columns
     for (let i = 0; i <= 2; i++) {
         if (check(i, i + 3, i + 6)) {
-            return indexes[i];
+            return indexes.value[i];
         }
     }
 
@@ -134,11 +176,11 @@ checkEnd = () => {
     for (let i = 0; i <= 2; i += 2) {
         if (i == 0) {
             if (check(i, i + 4, i + 8)) {
-                return indexes[i];
+                return indexes.value[i];
             }
         } else {
             if (check(i, i + 2, i + 4)) {
-                return indexes[i];
+                return indexes.value[i];
             }
         }
     }
