@@ -16,7 +16,7 @@ const newGameWrapper = document.querySelector(".new-game-wrapper");
 
 // variables
 let indexes = {
-   value:  [
+    value: [
         '',
         '',
         '',
@@ -28,7 +28,7 @@ let indexes = {
         ''
     ],
     len: 0
-} 
+}
 
 let turn = {
     player: false,
@@ -56,8 +56,38 @@ let gameIsRuning = false;
 
 
 // UI handling
-//=========================== go from here ============================
+startBTN.addEventListener("click", () => {
+    startWrapper.style.display = "none";
+    chooseWrapper.style.display = "flex";
+});
 
+
+
+xBTN.addEventListener("click", () => {
+    player.charachter = charachters.x;
+    comp.charachter = charachters.o;
+
+    chooseWrapper.style.display = "none";
+
+    startGame();
+    compTurn();
+})
+
+oBTN.addEventListener("click", () => {
+    player.charachter = charachters.o;
+    comp.charachter = charachters.x;
+
+    chooseWrapper.style.display = "none";
+
+    startGame();
+    compTurn();
+})
+
+newGameBTN.addEventListener("click", () => {
+    init();
+    newGameWrapper.style.display = "none";
+    chooseWrapper.style.display = "flex";
+})
 
 // click listener for player`s turn
 for (let i = 0; i < columns.length; i++) {
@@ -75,36 +105,41 @@ for (let i = 0; i < columns.length; i++) {
 // handling comp move in diferent situations
 compMove = () => {
     const first = [0, 2, 4, 6, 8];
-    if(isEmpety()) {
+    if (isEmpety()) {
         let index = getRandomNumber(0, 4);
         indexes.value[first[index]] = comp.charachter;
         indexes.len++;
         columns[first[index]].innerHTML = comp.charachter;
+    } else if (indexes.len === 8) {
+        let index = getEmpeties();
+        indexes.value[index[0]] = comp.charachter;
+        indexes.len++;
+        columns[index[0]].innerHTML = comp.charachter;
     } else {
-        if(indexes.len === 1) {
-            if(indexes.value[4] === '') {
+        if (indexes.len === 1) {
+            if (indexes.value[4] === '') {
                 indexes.value[4] = comp.charachter;
                 indexes.len++;
                 columns[4].innerHTML = comp.charachter;
             } else {
                 first.splice(2, 1);
                 let index = getRandomNumber(0, 3);
-                while(indexes.value[first[index]] != '') {
+                while (indexes.value[first[index]] != '') {
                     index = getRandomNumber(0, 3);
                 }
                 indexes.value[first[index]] = comp.charachter;
                 indexes.len++;
                 columns[first[index]].innerHTML = comp.charachter;
             }
-        } else if(indexes.len === 2) {
-            if(indexes.value[4] === '') {
+        } else if (indexes.len === 2) {
+            if (indexes.value[4] === '') {
                 indexes.value[4] = comp.charachter;
                 indexes.len++;
                 columns[4].innerHTML = comp.charachter;
             } else {
                 first.splice(2, 1);
                 let index = getRandomNumber(0, 3);
-                while(indexes.value[first[index]] != '') {
+                while (indexes.value[first[index]] != '') {
                     index = getRandomNumber(0, 3);
                 }
                 indexes.value[first[index]] = comp.charachter;
@@ -112,34 +147,70 @@ compMove = () => {
                 columns[first[index]].innerHTML = comp.charachter;
             }
         } else {
-            let index = isPlayerWining();
-            if(index != -1) {
+            let index = isCompWining();
+            if (index != -1) {
                 indexes.value[index] = comp.charachter;
                 indexes.len++;
                 columns[index].innerHTML = comp.charachter;
             } else {
-                index = isCompWining();
-                if(index != -1) {
+                index = isPlayerWining();
+                if (index != -1) {
                     indexes.value[index] = comp.charachter;
                     indexes.len++;
                     columns[index].innerHTML = comp.charachter;
                 } else {
-                    if(indexes.value[4] === '') {
+                    if (indexes.value[4] === '') {
                         indexes.value[4] = comp.charachter;
                         indexes.len++;
                         columns[4].innerHTML = comp.charachter;
                     } else {
-                        index = empetyPlus();
-                        if(index != -1) {
+                        index = twoMovePridect();
+                        if (index != -1) {
                             indexes.value[index] = comp.charachter;
                             indexes.len++;
                             columns[index].innerHTML = comp.charachter;
                         } else {
-                            let empetyIndexes = getEmpeties();
-                            let index = getRandomNumber(0, empetyIndexes.length - 1);
-                            indexes.value[index] = comp.charachter;
-                            indexes.len++;
-                            columns[index].innerHTML = comp.charachter;
+                            index = winPredict();
+                            if (index != -1) {
+                                indexes.value[index] = comp.charachter;
+                                indexes.len++;
+                                columns[index].innerHTML = comp.charachter;
+                            } else {
+                                if (indexes.len === 3) {
+                                    index = preventTwoMove();
+                                    if (index != -1) {
+                                        indexes.value[index] = comp.charachter;
+                                        indexes.len++;
+                                        columns[index].innerHTML = comp.charachter;
+                                    } else {
+                                        index = empetyPlus();
+                                        if (index != -1) {
+                                            indexes.value[index] = comp.charachter;
+                                            indexes.len++;
+                                            columns[index].innerHTML = comp.charachter;
+                                        } else {
+                                            let empetyIndexes = getEmpeties();
+                                            let index = getRandomNumber(0, empetyIndexes.length - 1);
+                                            indexes.value[index] = comp.charachter;
+                                            indexes.len++;
+                                            columns[index].innerHTML = comp.charachter;
+                                        }
+                                    }
+                                } else {
+                                    index = empetyPlus();
+                                    if (index != -1) {
+                                        indexes.value[index] = comp.charachter;
+                                        indexes.len++;
+                                        columns[index].innerHTML = comp.charachter;
+                                    } else {
+                                        let empetyIndexes = getEmpeties();
+                                        let index = getRandomNumber(0, empetyIndexes.length - 1);
+                                        indexes.value[index] = comp.charachter;
+                                        indexes.len++;
+                                        columns[index].innerHTML = comp.charachter;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -152,176 +223,213 @@ isCompWining = () => {
 
     // checking to see if comp can win in rows
     for (let i = 0; i <= 6; i += 3) {
-        if((indexes.value[i] === indexes.value[i+1]) && 
-            indexes.value[i] === comp.charachter && 
-            indexes.value[i+2] === '') {
+        if ((indexes.value[i] === indexes.value[i + 1]) &&
+            indexes.value[i] === comp.charachter &&
+            indexes.value[i + 2] === '') {
 
-                return i+2;
+            return i + 2;
 
-        } else if((indexes.value[i] === indexes.value[i+2]) && 
-                   indexes.value[i] === comp.charachter && 
-                   indexes.value[i+1] === '') {
+        } else if ((indexes.value[i] === indexes.value[i + 2]) &&
+            indexes.value[i] === comp.charachter &&
+            indexes.value[i + 1] === '') {
 
-                return i+1;
+            return i + 1;
 
-        } else if((indexes.value[i+1] === indexes.value[i+2]) && 
-                   indexes.value[i+1] === comp.charachter && 
-                   indexes.value[i] === '') {
+        } else if ((indexes.value[i + 1] === indexes.value[i + 2]) &&
+            indexes.value[i + 1] === comp.charachter &&
+            indexes.value[i] === '') {
 
-                return i;
+            return i;
 
         }
     }
 
     // checking to see if comp can win in columns
     for (let i = 0; i < 3; i++) {
-        if((indexes.value[i] === indexes.value[i+3]) && 
-            indexes.value[i] === comp.charachter && 
-            indexes.value[i+6] === '') {
+        if ((indexes.value[i] === indexes.value[i + 3]) &&
+            indexes.value[i] === comp.charachter &&
+            indexes.value[i + 6] === '') {
 
-                return i+6;
-        
-        } else if((indexes.value[i] === indexes.value[i+6]) && 
-                   indexes.value[i] === comp.charachter && 
-                   indexes.value[i+3] === '') {
+            return i + 6;
 
-                return i+3;
+        } else if ((indexes.value[i] === indexes.value[i + 6]) &&
+            indexes.value[i] === comp.charachter &&
+            indexes.value[i + 3] === '') {
 
-        } else if((indexes.value[i+3] === indexes.value[i+6]) && 
-                   indexes.value[i+3] === comp.charachter && 
-                   indexes.value[i] === '') {
+            return i + 3;
 
-                return i;
+        } else if ((indexes.value[i + 3] === indexes.value[i + 6]) &&
+            indexes.value[i + 3] === comp.charachter &&
+            indexes.value[i] === '') {
+
+            return i;
 
         }
     }
 
     // checking to see if comp can win in diameters
-    if((indexes.value[0] === indexes.value[4]) && 
-        indexes.value[0] === comp.charachter && 
+    if ((indexes.value[0] === indexes.value[4]) &&
+        indexes.value[0] === comp.charachter &&
         indexes.value[8] === '') {
 
-            return 8;
-    
-    } else if((indexes.value[0] === indexes.value[8]) && 
-               indexes.value[0] === comp.charachter && 
-               indexes.value[4] === '') {
+        return 8;
 
-            return 4;
+    } else if ((indexes.value[0] === indexes.value[8]) &&
+        indexes.value[0] === comp.charachter &&
+        indexes.value[4] === '') {
 
-    } else if((indexes.value[4] === indexes.value[8]) && 
-               indexes.value[4] === comp.charachter && 
-               indexes.value[0] === '') {
+        return 4;
 
-            return 0;
+    } else if ((indexes.value[4] === indexes.value[8]) &&
+        indexes.value[4] === comp.charachter &&
+        indexes.value[0] === '') {
 
-    } else if((indexes.value[2] === indexes.value[4]) && 
-               indexes.value[2] === comp.charachter && 
-               indexes.value[6] === '') {
+        return 0;
 
-            return 6;
+    } else if ((indexes.value[2] === indexes.value[4]) &&
+        indexes.value[2] === comp.charachter &&
+        indexes.value[6] === '') {
 
-    } else if((indexes.value[2] === indexes.value[6]) && 
-               indexes.value[2] === comp.charachter && 
-               indexes.value[4] === '') {
+        return 6;
 
-            return 4;
+    } else if ((indexes.value[2] === indexes.value[6]) &&
+        indexes.value[2] === comp.charachter &&
+        indexes.value[4] === '') {
 
-    } else if((indexes.value[4] === indexes.value[6]) && 
-               indexes.value[4] === comp.charachter && 
-               indexes.value[2] === '') {
+        return 4;
 
-            return 2;
+    } else if ((indexes.value[4] === indexes.value[6]) &&
+        indexes.value[4] === comp.charachter &&
+        indexes.value[2] === '') {
+
+        return 2;
 
     }
 
     return -1;
 }
 
-isPlayerWining = () => {
+winPredict = () => {
+    if (indexes.len === 4) {
+        if (indexes.value[4] === comp.charachter) {
+            if (indexes.value[0] === comp.charachter) {
+                if (indexes.value[1] === '') {
+                    return 1;
+                } else if (indexes.value[3] === '') {
+                    return 3;
+                }
+            } else if (indexes.value[2] === comp.charachter) {
+                if (indexes.value[1] === '') {
+                    return 1;
+                } else if (indexes.value[5] === '') {
+                    return 5;
+                }
+            } else if (indexes.value[6] === comp.charachter) {
+                if (indexes.value[3] === '') {
+                    return 3;
+                } else if (indexes.value[7] === '') {
+                    return 7;
+                }
+            } else if (indexes.value[8] === comp.charachter) {
+                if (indexes.value[5] === '') {
+                    return 5;
+                } else if (indexes.value[7] === '') {
+                    return 7;
+                }
+            } else {
+                return -1;
+            }
+        } else {
+            return -1;
+        }
+    } else {
+        return -1;
+    }
+}
 
+isPlayerWining = () => {
     // checking to see if player can win in rows
     for (let i = 0; i <= 6; i += 3) {
-        if((indexes.value[i] === indexes.value[i+1]) && 
-            indexes.value[i] === player.charachter && 
-            indexes.value[i+2] === '') {
+        if ((indexes.value[i] === indexes.value[i + 1]) &&
+            indexes.value[i] === player.charachter &&
+            indexes.value[i + 2] === '') {
 
-                return i+2;
+            return i + 2;
 
-        } else if((indexes.value[i] === indexes.value[i+2]) && 
-                   indexes.value[i] === player.charachter && 
-                   indexes.value[i+1] === '') {
+        } else if ((indexes.value[i] === indexes.value[i + 2]) &&
+            indexes.value[i] === player.charachter &&
+            indexes.value[i + 1] === '') {
 
-                return i+1;
+            return i + 1;
 
-        } else if((indexes.value[i+1] === indexes.value[i+2]) && 
-                   indexes.value[i+1] === player.charachter && 
-                   indexes.value[i] === '') {
+        } else if ((indexes.value[i + 1] === indexes.value[i + 2]) &&
+            indexes.value[i + 1] === player.charachter &&
+            indexes.value[i] === '') {
 
-                return i;
+            return i;
 
         }
     }
 
     // checking to see if player can win in columns
     for (let i = 0; i < 3; i++) {
-        if((indexes.value[i] === indexes.value[i+3]) && 
-            indexes.value[i] === player.charachter && 
-            indexes.value[i+6] === '') {
+        if ((indexes.value[i] === indexes.value[i + 3]) &&
+            indexes.value[i] === player.charachter &&
+            indexes.value[i + 6] === '') {
 
-                return i+6;
-        
-        } else if((indexes.value[i] === indexes.value[i+6]) && 
-                   indexes.value[i] === player.charachter && 
-                   indexes.value[i+3] === '') {
+            return i + 6;
 
-                return i+3;
+        } else if ((indexes.value[i] === indexes.value[i + 6]) &&
+            indexes.value[i] === player.charachter &&
+            indexes.value[i + 3] === '') {
 
-        } else if((indexes.value[i+3] === indexes.value[i+6]) && 
-                   indexes.value[i+3] === player.charachter && 
-                   indexes.value[i] === '') {
+            return i + 3;
 
-                return i;
+        } else if ((indexes.value[i + 3] === indexes.value[i + 6]) &&
+            indexes.value[i + 3] === player.charachter &&
+            indexes.value[i] === '') {
+
+            return i;
 
         }
     }
 
     // checking to see if player can win in diameters
-    if((indexes.value[0] === indexes.value[4]) && 
-        indexes.value[0] === player.charachter && 
+    if ((indexes.value[0] === indexes.value[4]) &&
+        indexes.value[0] === player.charachter &&
         indexes.value[8] === '') {
 
-            return 8;
-    
-    } else if((indexes.value[0] === indexes.value[8]) && 
-               indexes.value[0] === player.charachter && 
-               indexes.value[4] === '') {
+        return 8;
 
-            return 4;
+    } else if ((indexes.value[0] === indexes.value[8]) &&
+        indexes.value[0] === player.charachter &&
+        indexes.value[4] === '') {
 
-    } else if((indexes.value[4] === indexes.value[8]) && 
-               indexes.value[4] === player.charachter && 
-               indexes.value[0] === '') {
+        return 4;
 
-            return 0;
+    } else if ((indexes.value[4] === indexes.value[8]) &&
+        indexes.value[4] === player.charachter &&
+        indexes.value[0] === '') {
 
-    } else if((indexes.value[2] === indexes.value[4]) && 
-               indexes.value[2] === player.charachter && 
-               indexes.value[6] === '') {
+        return 0;
 
-            return 6;
+    } else if ((indexes.value[2] === indexes.value[4]) &&
+        indexes.value[2] === player.charachter &&
+        indexes.value[6] === '') {
 
-    } else if((indexes.value[2] === indexes.value[6]) && 
-               indexes.value[2] === player.charachter && 
-               indexes.value[4] === '') {
+        return 6;
 
-            return 4;
+    } else if ((indexes.value[2] === indexes.value[6]) &&
+        indexes.value[2] === player.charachter &&
+        indexes.value[4] === '') {
 
-    } else if((indexes.value[4] === indexes.value[6]) && 
-               indexes.value[4] === player.charachter && 
-               indexes.value[2] === '') {
+        return 4;
 
-            return 2;
+    } else if ((indexes.value[4] === indexes.value[6]) &&
+        indexes.value[4] === player.charachter &&
+        indexes.value[2] === '') {
+
+        return 2;
 
     }
 
@@ -329,9 +437,65 @@ isPlayerWining = () => {
 
 }
 
+preventTwoMove = () => {
+    if (indexes.value[4] === indexes.value[0]
+        && indexes.value[4] === player.charachter) {
+        if (indexes.value[2] === '') {
+            return 2;
+        } else if (indexes.value[6] === '') {
+            return 6;
+        }
+    } else if (indexes.value[4] === indexes.value[2]
+        && indexes.value[4] === player.charachter) {
+            if (indexes.value[0] === '') {
+                return 0;
+            } else if (indexes.value[8] === '') {
+                return 8;
+            }
+    } else if (indexes.value[4] === indexes.value[6]
+        && indexes.value[4] === player.charachter) {
+            if (indexes.value[0] === '') {
+                return 0;
+            } else if (indexes.value[8] === '') {
+                return 8;
+            }
+    } else if (indexes.value[4] === indexes.value[8]
+        && indexes.value[4] === player.charachter) {
+            if (indexes.value[2] === '') {
+                return 2;
+            } else if (indexes.value[6] === '') {
+                return 6;
+            }
+    } else {
+        return -1;
+    }
+}
+
+twoMovePridect = () => {
+    if (indexes.value[1] === indexes.value[3] &&
+        indexes.value[1] === player.charachter &&
+        indexes.value[0] === '') {
+        return 0;
+    } else if (indexes.value[1] === indexes.value[5] &&
+        indexes.value[1] === player.charachter &&
+        indexes.value[2] === '') {
+        return 2;
+    } else if (indexes.value[3] === indexes.value[7] &&
+        indexes.value[3] === player.charachter &&
+        indexes.value[6] === '') {
+        return 6;
+    } else if (indexes.value[5] === indexes.value[7] &&
+        indexes.value[5] === player.charachter &&
+        indexes.value[8] === '') {
+        return 8;
+    } else {
+        return -1;
+    }
+}
+
 check = (first, second, third) => {
-    if (indexes.value[first] === indexes.value[second] && 
-        indexes.value[first] === indexes.value[third] && 
+    if (indexes.value[first] === indexes.value[second] &&
+        indexes.value[first] === indexes.value[third] &&
         indexes.value[first] != '') {
 
         return true;
@@ -361,13 +525,13 @@ getEmpeties = () => {
 }
 
 empetyCorner = () => {
-    if(indexes.value[0] === '') {
+    if (indexes.value[0] === '') {
         return 0;
-    } else if(indexes.value[2] === '') {
+    } else if (indexes.value[2] === '') {
         return 2;
-    } else if(indexes.value[6] === '') {
+    } else if (indexes.value[6] === '') {
         return 6;
-    } else if(indexes.value[8] === '') {
+    } else if (indexes.value[8] === '') {
         return 8;
     } else {
         return -1;
@@ -375,13 +539,13 @@ empetyCorner = () => {
 }
 
 empetyPlus = () => {
-    if(indexes.value[1] === '') {
+    if (indexes.value[1] === '') {
         return 1;
-    } else if(indexes.value[3] === '') {
+    } else if (indexes.value[3] === '') {
         return 3;
-    } else if(indexes.value[5] === '') {
+    } else if (indexes.value[5] === '') {
         return 5;
-    } else if(indexes.value[7] === '') {
+    } else if (indexes.value[7] === '') {
         return 7;
     } else {
         return -1;
@@ -399,19 +563,22 @@ compTurn = () => {
 
         if (winner === player.charachter) {
             clearInterval(compInterval);
-            console.log("you won");
+            newGameWrapper.firstElementChild.firstElementChild.firstElementChild.innerHTML = "You won =)";
+            newGameWrapper.style.display = "flex";
             turn.comp = false;
             turn.player = false;
             gameIsRuning = false;
         } else if (winner === comp.charachter) {
             clearInterval(compInterval);
-            console.log("you lose");
+            newGameWrapper.firstElementChild.firstElementChild.firstElementChild.innerHTML = "You lose =(";
+            newGameWrapper.style.display = "flex";
             turn.player = false;
             turn.comp = false;
             gameIsRuning = false;
         } else if (winner === 'draw') {
             clearInterval(compInterval);
-            console.log("draw");
+            newGameWrapper.firstElementChild.firstElementChild.firstElementChild.innerHTML = "Draw";
+            newGameWrapper.style.display = "flex";
             turn.player = false;
             turn.comp = false;
             gameIsRuning = false;
@@ -473,16 +640,19 @@ startGame = () => {
 
 init = () => {
     indexes.value = [
-             '',
-             '',
-             '',
-             '',
-             '',
-             '',
-             '',
-             '',
-             ''
-         ];
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        ''
+    ];
+    for (let i = 0; i < columns.length; i++) {
+        columns[i].innerHTML = "";
+    }
     indexes.len = 0;
     turn.player = false;
     turn.comp = false;
@@ -493,6 +663,4 @@ init = () => {
 }
 
 
-startGame();
-compTurn();
 
